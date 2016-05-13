@@ -562,46 +562,20 @@ public class MemCachedClient {
 	 * @return <code>true</code>, if the data was deleted successfully
 	 */
 	public boolean delete(String key) {
-		return client.delete(key);
+		return client.delete(key, null);
 	}
 
 	/**
-	 * Deletes an object from cache given cache key and expiration date.
+	 * Deletes an object from cache given cache key and hashcode.
 	 * 
-	 * @deprecated not supported in memcached 1.4+
-	 * @param key
-	 *            the key to be removed
-	 * @param expiry
-	 *            when to expire the record.
-	 * @return <code>true</code>, if the data was deleted successfully
-	 */
-	public boolean delete(String key, Date expiry) {
-		return client.delete(key, expiry);
-	}
-
-	/**
-	 * Deletes an object from cache given cache key, a delete time, and an
-	 * optional hashcode.
-	 * 
-	 * The item is immediately made non retrievable.<br/>
-	 * Keep in mind {@link #add(String, Object) add} and
-	 * {@link #replace(String, Object) replace}<br/>
-	 * will fail when used with the same key will fail, until the server reaches
-	 * the<br/>
-	 * specified time. However, {@link #set(String, Object) set} will succeed,<br/>
-	 * and the new value will not be deleted.
-	 * 
-	 * @deprecated not supported in memcached 1.4+
 	 * @param key
 	 *            the key to be removed
 	 * @param hashCode
 	 *            if not null, then the int hashcode to use
-	 * @param expiry
-	 *            when to expire the record.
 	 * @return <code>true</code>, if the data was deleted successfully
 	 */
-	public boolean delete(String key, Integer hashCode, Date expiry) {
-		return client.delete(key, hashCode, expiry);
+	public boolean delete(String key, Integer hashCode) {
+		return client.delete(key, hashCode);
 	}
 
 	/**
@@ -645,7 +619,23 @@ public class MemCachedClient {
 	 * @return true, if the data was successfully stored
 	 */
 	public boolean set(String key, Object value, Date expiry) {
-		return client.set(key, value, expiry);
+		return client.set(key, value, getExpiry(expiry));
+	}
+
+	/**
+	 * Stores data on the server; the key, value, and a ttl in seconds are
+	 * specified.
+	 * 
+	 * @param key
+	 *            key to store data under
+	 * @param value
+	 *            value to store
+	 * @param ttl
+	 *            how long the record should live
+	 * @return true, if the data was successfully stored
+	 */
+	public boolean set(String key, Object value, Long ttl) {
+		return client.set(key, value, ttl);
 	}
 
 	/**
@@ -663,9 +653,27 @@ public class MemCachedClient {
 	 * @return true, if the data was successfully stored
 	 */
 	public boolean set(String key, Object value, Date expiry, Integer hashCode) {
-		return client.set(key, value, expiry, hashCode);
+		return client.set(key, value, getExpiry(expiry), hashCode);
 	}
 	
+	/**
+	 * Stores data on the server; the key, value, and a ttl in seconds are
+	 * specified.
+	 * 
+	 * @param key
+	 *            key to store data under
+	 * @param value
+	 *            value to store
+	 * @param ttl
+	 *            how long the record should live
+	 * @param hashCode
+	 *            if not null, then the int hashcode to use
+	 * @return true, if the data was successfully stored
+	 */
+	public boolean set(String key, Object value, Long ttl, Integer hashCode) {
+		return client.set(key, value, ttl, hashCode);
+	}
+
 	/**
 	 * Stores data on the server; the key, value, and an expiration time are
 	 * specified.
@@ -683,7 +691,27 @@ public class MemCachedClient {
 	 * @return true, if the data was successfully stored
 	 */
 	public boolean set(String key, Object value, Date expiry, Integer hashCode, boolean asString) {
-		return client.set(key, value, expiry, hashCode, asString);
+		return client.set(key, value, getExpiry(expiry), hashCode, asString);
+	}
+
+	/**
+	 * Stores data on the server; the key, value, and a ttl in seconds are
+	 * specified.
+	 * 
+	 * @param key
+	 *            key to store data under
+	 * @param value
+	 *            value to store
+	 * @param ttl
+	 *            how long the record should live
+	 * @param hashCode
+	 *            if not null, then the int hashcode to use
+	 * @param asString
+	 *            if true, then store all primitives as their string value
+	 * @return true, if the data was successfully stored
+	 */
+	public boolean set(String key, Object value, Long ttl, Integer hashCode, boolean asString) {
+		return client.set(key, value, ttl, hashCode, asString);
 	}
 
 	/**
@@ -728,7 +756,23 @@ public class MemCachedClient {
 	 * @return true, if the data was successfully stored
 	 */
 	public boolean add(String key, Object value, Date expiry) {
-		return client.add(key, value, expiry);
+		return client.add(key, value, getExpiry(expiry));
+	}
+
+	/**
+	 * Adds data to the server; the key, value, and a ttl in seconds are
+	 * specified.
+	 * 
+	 * @param key
+	 *            key to store data under
+	 * @param value
+	 *            value to store
+	 * @param ttl
+	 *            how long the record should live
+	 * @return true, if the data was successfully stored
+	 */
+	public boolean add(String key, Object value, Long ttl) {
+		return client.add(key, value, ttl);
 	}
 
 	/**
@@ -746,7 +790,25 @@ public class MemCachedClient {
 	 * @return true, if the data was successfully stored
 	 */
 	public boolean add(String key, Object value, Date expiry, Integer hashCode) {
-		return client.add(key, value, expiry, hashCode);
+		return client.add(key, value, getExpiry(expiry), hashCode);
+	}
+
+	/**
+	 * Adds data to the server; the key, value, and a ttl in seconds are
+	 * specified.
+	 * 
+	 * @param key
+	 *            key to store data under
+	 * @param value
+	 *            value to store
+	 * @param ttl
+	 *            how long the record should live
+	 * @param hashCode
+	 *            if not null, then the int hashcode to use
+	 * @return true, if the data was successfully stored
+	 */
+	public boolean add(String key, Object value, Long ttl, Integer hashCode) {
+		return client.add(key, value, ttl, hashCode);
 	}
 
 	/**
@@ -791,7 +853,23 @@ public class MemCachedClient {
 	 * @return true, if the data was successfully stored
 	 */
 	public boolean replace(String key, Object value, Date expiry) {
-		return client.replace(key, value, expiry);
+		return client.replace(key, value, getExpiry(expiry));
+	}
+
+	/**
+	 * Updates data on the server; the key, value, and a ttl in seconds are
+	 * specified.
+	 * 
+	 * @param key
+	 *            key to store data under
+	 * @param value
+	 *            value to store
+	 * @param ttl
+	 *            how long the record should live
+	 * @return true, if the data was successfully stored
+	 */
+	public boolean replace(String key, Object value, Long ttl) {
+		return client.replace(key, value, ttl);
 	}
 
 	/**
@@ -809,7 +887,25 @@ public class MemCachedClient {
 	 * @return true, if the data was successfully stored
 	 */
 	public boolean replace(String key, Object value, Date expiry, Integer hashCode) {
-		return client.replace(key, value, expiry, hashCode);
+		return client.replace(key, value, getExpiry(expiry), hashCode);
+	}
+
+	/**
+	 * Updates data on the server; the key, value, and a ttl in seconds are
+	 * specified.
+	 * 
+	 * @param key
+	 *            key to store data under
+	 * @param value
+	 *            value to store
+	 * @param ttl
+	 *            how long the record should live
+	 * @param hashCode
+	 *            if not null, then the int hashcode to use
+	 * @return true, if the data was successfully stored
+	 */
+	public boolean replace(String key, Object value, Long ttl, Integer hashCode) {
+		return client.replace(key, value, ttl, hashCode);
 	}
 
 	/**
@@ -822,7 +918,7 @@ public class MemCachedClient {
 	 * @return true/false indicating success
 	 */
 	public boolean storeCounter(String key, Long counter) {
-		return storeCounter(key, counter, null, null);
+		return storeCounter(key, counter, 0L, null);
 	}
 
 	/**
@@ -837,7 +933,22 @@ public class MemCachedClient {
 	 * @return true/false indicating success
 	 */
 	public boolean storeCounter(String key, Long counter, Date date) {
-		return storeCounter(key, counter, date, null);
+		return storeCounter(key, counter, getExpiry(date), null);
+	}
+
+	/**
+	 * Store a counter to memcached given a key
+	 * 
+	 * @param key
+	 *            cache key
+	 * @param counter
+	 *            number to store
+	 * @param ttl
+	 *            how long the record should live
+	 * @return true/false indicating success
+	 */
+	public boolean storeCounter(String key, Long counter, Long ttl) {
+		return storeCounter(key, counter, ttl, null);
 	}
 
 	/**
@@ -854,7 +965,24 @@ public class MemCachedClient {
 	 * @return true/false indicating success
 	 */
 	public boolean storeCounter(String key, Long counter, Date date, Integer hashCode) {
-		return set(key, counter, date, hashCode, true);
+		return set(key, counter, getExpiry(date), hashCode, true);
+	}
+
+	/**
+	 * Store a counter to memcached given a key
+	 * 
+	 * @param key
+	 *            cache key
+	 * @param counter
+	 *            number to store
+	 * @param ttl
+	 *            how long the record should live
+	 * @param hashCode
+	 *            if not null, then the int hashcode to use
+	 * @return true/false indicating success
+	 */
+	public boolean storeCounter(String key, Long counter, Long ttl, Integer hashCode) {
+		return set(key, counter, ttl, hashCode, true);
 	}
 
 	/**
@@ -869,7 +997,7 @@ public class MemCachedClient {
 	 * @return true/false indicating success
 	 */
 	public boolean storeCounter(String key, Long counter, Integer hashCode) {
-		return storeCounter(key, counter, null, hashCode);
+		return storeCounter(key, counter, 0L, hashCode);
 	}
 
 	/**
@@ -1451,11 +1579,19 @@ public class MemCachedClient {
 	}
 
 	public boolean cas(String key, Object value, Date expiry, long casUnique) {
-		return client.cas(key, value, expiry, casUnique);
+		return client.cas(key, value, getExpiry(expiry), casUnique);
+	}
+
+	public boolean cas(String key, Object value, Long ttl, long casUnique) {
+		return client.cas(key, value, ttl, casUnique);
 	}
 
 	public boolean cas(String key, Object value, Date expiry, Integer hashCode, long casUnique) {
-		return client.cas(key, value, expiry, hashCode, casUnique);
+		return client.cas(key, value, getExpiry(expiry), hashCode, casUnique);
+	}
+
+	public boolean cas(String key, Object value, Long ttl, Integer hashCode, long casUnique) {
+		return client.cas(key, value, ttl, hashCode, casUnique);
 	}
 
 	public boolean cas(String key, Object value, long casUnique) {
@@ -1469,4 +1605,10 @@ public class MemCachedClient {
 	public boolean prepend(String key, Object value) {
 		return client.prepend(key, value);
 	}
+	
+	
+	protected Long getExpiry(Date expiry) {
+		return (null!=expiry) ? expiry.getTime() / 1000: 0;
+	}
+
 }

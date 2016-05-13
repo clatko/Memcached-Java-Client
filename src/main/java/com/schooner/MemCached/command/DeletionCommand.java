@@ -30,7 +30,6 @@ package com.schooner.MemCached.command;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,13 +50,11 @@ public class DeletionCommand extends Command {
 	private static final byte[] NOTFOUND = "NOT_FOUND\r\n".getBytes();
 
 	/**
-	 * deletion request textline: "delete <key> [<time>] [noreply]\r\n"
+	 * deletion request textline: "delete <key> [noreply]\r\n"
 	 * 
 	 */
-	public DeletionCommand(String key, Integer hashCode, Date expiry) {
+	public DeletionCommand(String key, Integer hashCode) {
 		StringBuilder command = new StringBuilder("delete").append(DELIMITER).append(key);
-		if (expiry != null)
-			command.append(" " + expiry.getTime() / 1000);
 		command.append("\r\n");
 		textLine = command.toString().getBytes();
 	}

@@ -150,17 +150,29 @@ public class AscIIUDPClient extends MemCachedClient {
 	}
 
 	public boolean set(String key, Object value, Date expiry) {
-		return set("set", key, value, expiry, null, 0L);
+		return set("set", key, value, getExpiry(expiry), null, 0L);
+	}
+
+	public boolean set(String key, Object value, Long ttl) {
+		return set("set", key, value, ttl, null, 0L);
 	}
 
 	public boolean set(String key, Object value, Date expiry, Integer hashCode) {
-		return set("set", key, value, expiry, hashCode, 0L);
+		return set("set", key, value, getExpiry(expiry), hashCode, 0L);
 	}
 	
-	public boolean set(String key, Object value, Date expiry, Integer hashCode, boolean asString) {
-		return set("set", key, value, expiry, hashCode, 0L);
+	public boolean set(String key, Object value, Long ttl, Integer hashCode) {
+		return set("set", key, value, ttl, hashCode, 0L);
 	}
 
+	public boolean set(String key, Object value, Date expiry, Integer hashCode, boolean asString) {
+		return set("set", key, value, getExpiry(expiry), hashCode, 0L);
+	}
+
+	public boolean set(String key, Object value, Long ttl, Integer hashCode, boolean asString) {
+		return set("set", key, value, ttl, hashCode, 0L);
+	}
+	
 	public boolean add(String key, Object value) {
 		return set("add", key, value, null, null, 0L);
 	}
@@ -170,11 +182,19 @@ public class AscIIUDPClient extends MemCachedClient {
 	}
 
 	public boolean add(String key, Object value, Date expiry) {
-		return set("add", key, value, expiry, null, 0L);
+		return set("add", key, value, getExpiry(expiry), null, 0L);
+	}
+
+	public boolean add(String key, Object value, Long ttl) {
+		return set("add", key, value, ttl, null, 0L);
 	}
 
 	public boolean add(String key, Object value, Date expiry, Integer hashCode) {
-		return set("add", key, value, expiry, hashCode, 0L);
+		return set("add", key, value, getExpiry(expiry), hashCode, 0L);
+	}
+
+	public boolean add(String key, Object value, Long ttl, Integer hashCode) {
+		return set("add", key, value, ttl, hashCode, 0L);
 	}
 
 	public boolean append(String key, Object value, Integer hashCode) {
@@ -190,11 +210,19 @@ public class AscIIUDPClient extends MemCachedClient {
 	}
 
 	public boolean cas(String key, Object value, Date expiry, long casUnique) {
-		return set("cas", key, value, expiry, null, casUnique);
+		return set("cas", key, value, getExpiry(expiry), null, casUnique);
+	}
+
+	public boolean cas(String key, Object value, Long ttl, long casUnique) {
+		return set("cas", key, value, ttl, null, casUnique);
 	}
 
 	public boolean cas(String key, Object value, Date expiry, Integer hashCode, long casUnique) {
-		return set("cas", key, value, expiry, hashCode, casUnique);
+		return set("cas", key, value, getExpiry(expiry), hashCode, casUnique);
+	}
+
+	public boolean cas(String key, Object value, Long ttl, Integer hashCode, long casUnique) {
+		return set("cas", key, value, ttl, hashCode, casUnique);
 	}
 
 	public boolean cas(String key, Object value, long casUnique) {
@@ -218,11 +246,19 @@ public class AscIIUDPClient extends MemCachedClient {
 	}
 
 	public boolean replace(String key, Object value, Date expiry) {
-		return set("replace", key, value, expiry, null, 0L);
+		return set("replace", key, value, getExpiry(expiry), null, 0L);
+	}
+
+	public boolean replace(String key, Object value, Long ttl) {
+		return set("replace", key, value, ttl, null, 0L);
 	}
 
 	public boolean replace(String key, Object value, Date expiry, Integer hashCode) {
-		return set("replace", key, value, expiry, hashCode, 0L);
+		return set("replace", key, value, getExpiry(expiry), hashCode, 0L);
+	}
+
+	public boolean replace(String key, Object value, Long ttl, Integer hashCode) {
+		return set("replace", key, value, ttl, hashCode, 0L);
 	}
 
 	/**
@@ -253,7 +289,7 @@ public class AscIIUDPClient extends MemCachedClient {
 	 *            if not null, then the int hashcode to use
 	 * @return true/false indicating success
 	 */
-	private boolean set(String cmdname, String key, Object value, Date expiry, Integer hashCode, Long casUnique) {
+	private boolean set(String cmdname, String key, Object value, Long expiry, Integer hashCode, Long casUnique) {
 
 		if (cmdname == null || key == null) {
 			log.error("key is null or cmd is null/empty for set()");
@@ -285,9 +321,6 @@ public class AscIIUDPClient extends MemCachedClient {
 				errorHandler.handleErrorOnSet(this, new IOException("no socket to server available"), key);
 			return false;
 		}
-
-		if (expiry == null)
-			expiry = new Date(0);
 
 		try {
 			StorageCommand setCmd = new StorageCommand(cmdname, key, value, expiry, hashCode, casUnique, transCoder);
@@ -377,11 +410,7 @@ public class AscIIUDPClient extends MemCachedClient {
 	}
 
 	public boolean delete(String key) {
-		return delete(key, null, null);
-	}
-
-	public boolean delete(String key, Date expiry) {
-		return delete(key, null, expiry);
+		return delete(key, null);
 	}
 
 	public boolean flushAll() {
@@ -782,7 +811,7 @@ public class AscIIUDPClient extends MemCachedClient {
 		return success;
 	}
 
-	public boolean delete(String key, Integer hashCode, Date expiry) {
+	public boolean delete(String key, Integer hashCode) {
 
 		if (key == null) {
 			log.error("null value for key passed to delete()");
@@ -800,7 +829,7 @@ public class AscIIUDPClient extends MemCachedClient {
 		}
 
 		try {
-			DeletionCommand deletion = new DeletionCommand(key, hashCode, expiry);
+			DeletionCommand deletion = new DeletionCommand(key, hashCode);
 			short rid = deletion.request(sock);
 			return deletion.response(sock, rid);
 		} catch (IOException e) {

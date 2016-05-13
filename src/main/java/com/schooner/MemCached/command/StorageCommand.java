@@ -71,11 +71,31 @@ public class StorageCommand extends Command {
 
 	/**
 	 * set request textline:
+	 * "set <key> <key> <flags> <ttl> <bytes> [noreply]\r\n"
+	 * 
+	 */
+	public StorageCommand(String cmdname, String key, Object value, Long ttl, Integer hashCode, Long casUnique) {
+		init(cmdname, key, value, ttl, hashCode, casUnique);
+	}
+
+	/**
+	 * set request textline:
 	 * "set <key> <key> <flags> <exptime> <bytes> [noreply]\r\n"
 	 * 
 	 */
 	public StorageCommand(String cmdname, String key, Object value, Date expiry, Integer hashCode, Long casUnique) {
-		init(cmdname, key, value, expiry, hashCode, casUnique);
+		init(cmdname, key, value, getExpiry(expiry), hashCode, casUnique);
+	}
+
+	/**
+	 * set request textline:
+	 * "set <key> <key> <flags> <ttl> <bytes> [noreply]\r\n"
+	 * 
+	 */
+	public StorageCommand(String cmdname, String key, Object value, Long ttl, Integer hashCode, Long casUnique,
+			TransCoder transCoder) {
+		init(cmdname, key, value, ttl, hashCode, casUnique);
+		this.transCoder = transCoder;
 	}
 
 	/**
@@ -85,16 +105,17 @@ public class StorageCommand extends Command {
 	 */
 	public StorageCommand(String cmdname, String key, Object value, Date expiry, Integer hashCode, Long casUnique,
 			TransCoder transCoder) {
-		init(cmdname, key, value, expiry, hashCode, casUnique);
+		init(cmdname, key, value, getExpiry(expiry), hashCode, casUnique);
 		this.transCoder = transCoder;
 	}
 
-	private void init(String cmdname, String key, Object value, Date expiry, Integer hashCode, Long casUnique) {
+	
+	private void init(String cmdname, String key, Object value, Long expiry, Integer hashCode, Long casUnique) {
 		// store flags
 		flags = NativeHandler.getMarkerFlag(value);
 		// construct the command
 		String cmd = new StringBuffer().append(cmdname).append(" ").append(key).append(" ").append(flags).append(" ")
-				.append(expiry.getTime() / 1000).append(" ").toString();
+				.append(expiry).append(" ").toString();
 
 		textLine = cmd.getBytes();
 

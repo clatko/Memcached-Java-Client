@@ -29,6 +29,7 @@
 package com.schooner.MemCached.command;
 
 import java.io.IOException;
+import java.util.Date;
 
 import com.schooner.MemCached.SchoonerSockIO;
 
@@ -55,5 +56,9 @@ public abstract class Command {
 		sock.writeBuf.flip();
 		sock.getByteChannel().write(sock.writeBuf);
 		return rid;
+	}
+	
+	protected Long getExpiry(Date expiry) {
+		return (null!=expiry) ? expiry.getTime() / 1000: 0;
 	}
 }

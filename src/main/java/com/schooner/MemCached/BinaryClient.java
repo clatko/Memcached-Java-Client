@@ -127,14 +127,10 @@ public class BinaryClient extends MemCachedClient {
 	}
 
 	public boolean delete(String key) {
-		return delete(key, null, null);
+		return delete(key, null);
 	}
 
-	public boolean delete(String key, Date expiry) {
-		return delete(key, null, expiry);
-	}
-
-	public boolean delete(String key, Integer hashCode, Date expiry) {
+	public boolean delete(String key, Integer hashCode) {
 
 		if (key == null) {
 			log.error("null value for key passed to delete()");

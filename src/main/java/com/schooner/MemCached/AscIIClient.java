@@ -135,14 +135,10 @@ public class AscIIClient extends MemCachedClient {
 	}
 
 	public boolean delete(String key) {
-		return delete(key, null, null);
+		return delete(key, null);
 	}
 
-	public boolean delete(String key, Date expiry) {
-		return delete(key, null, expiry);
-	}
-
-	public boolean delete(String key, Integer hashCode, Date expiry) {
+	public boolean delete(String key, Integer hashCode) {
 
 		if (key == null) {
 			log.error("null value for key passed to delete()");
@@ -173,9 +169,6 @@ public class AscIIClient extends MemCachedClient {
 
 		// build command
 		StringBuilder command = new StringBuilder("delete ").append(key);
-		if (expiry != null)
-			command.append(" " + expiry.getTime() / 1000);
-
 		command.append("\r\n");
 
 		try {
@@ -237,15 +230,27 @@ public class AscIIClient extends MemCachedClient {
 	}
 
 	public boolean set(String key, Object value, Date expiry) {
-		return set("set", key, value, expiry, null, 0L, primitiveAsString);
+		return set("set", key, value, getExpiry(expiry), null, 0L, primitiveAsString);
+	}
+
+	public boolean set(String key, Object value, Long ttl) {
+		return set("set", key, value, ttl, null, 0L, primitiveAsString);
 	}
 
 	public boolean set(String key, Object value, Date expiry, Integer hashCode) {
-		return set("set", key, value, expiry, hashCode, 0L, primitiveAsString);
+		return set("set", key, value, getExpiry(expiry), hashCode, 0L, primitiveAsString);
 	}
 	
+	public boolean set(String key, Object value, Long ttl, Integer hashCode) {
+		return set("set", key, value, ttl, hashCode, 0L, primitiveAsString);
+	}
+
 	public boolean set(String key, Object value, Date expiry, Integer hashCode, boolean asString) {
-		return set("set", key, value, expiry, hashCode, 0L, asString);
+		return set("set", key, value, getExpiry(expiry), hashCode, 0L, asString);
+	}
+
+	public boolean set(String key, Object value, Long ttl, Integer hashCode, boolean asString) {
+		return set("set", key, value, ttl, hashCode, 0L, asString);
 	}
 
 	public boolean add(String key, Object value) {
@@ -257,11 +262,19 @@ public class AscIIClient extends MemCachedClient {
 	}
 
 	public boolean add(String key, Object value, Date expiry) {
-		return set("add", key, value, expiry, null, 0L, primitiveAsString);
+		return set("add", key, value, getExpiry(expiry), null, 0L, primitiveAsString);
+	}
+
+	public boolean add(String key, Object value, Long ttl) {
+		return set("add", key, value, ttl, null, 0L, primitiveAsString);
 	}
 
 	public boolean add(String key, Object value, Date expiry, Integer hashCode) {
-		return set("add", key, value, expiry, hashCode, 0L, primitiveAsString);
+		return set("add", key, value, getExpiry(expiry), hashCode, 0L, primitiveAsString);
+	}
+
+	public boolean add(String key, Object value, Long ttl, Integer hashCode) {
+		return set("add", key, value, ttl, hashCode, 0L, primitiveAsString);
 	}
 
 	public boolean append(String key, Object value, Integer hashCode) {
@@ -277,11 +290,19 @@ public class AscIIClient extends MemCachedClient {
 	}
 
 	public boolean cas(String key, Object value, Date expiry, long casUnique) {
-		return set("cas", key, value, expiry, null, casUnique, primitiveAsString);
+		return set("cas", key, value, getExpiry(expiry), null, casUnique, primitiveAsString);
+	}
+
+	public boolean cas(String key, Object value, Long ttl, long casUnique) {
+		return set("cas", key, value, ttl, null, casUnique, primitiveAsString);
 	}
 
 	public boolean cas(String key, Object value, Date expiry, Integer hashCode, long casUnique) {
-		return set("cas", key, value, expiry, hashCode, casUnique, primitiveAsString);
+		return set("cas", key, value, getExpiry(expiry), hashCode, casUnique, primitiveAsString);
+	}
+
+	public boolean cas(String key, Object value, Long ttl, Integer hashCode, long casUnique) {
+		return set("cas", key, value, ttl, hashCode, casUnique, primitiveAsString);
 	}
 
 	public boolean cas(String key, Object value, long casUnique) {
@@ -305,11 +326,19 @@ public class AscIIClient extends MemCachedClient {
 	}
 
 	public boolean replace(String key, Object value, Date expiry) {
-		return set("replace", key, value, expiry, null, 0L, primitiveAsString);
+		return set("replace", key, value, getExpiry(expiry), null, 0L, primitiveAsString);
 	}
 
 	public boolean replace(String key, Object value, Date expiry, Integer hashCode) {
-		return set("replace", key, value, expiry, hashCode, 0L, primitiveAsString);
+		return set("replace", key, value, getExpiry(expiry), hashCode, 0L, primitiveAsString);
+	}
+
+	public boolean replace(String key, Object value, Long ttl, Integer hashCode) {
+		return set("replace", key, value, ttl, hashCode, 0L, primitiveAsString);
+	}
+
+	public boolean replace(String key, Object value, Long ttl) {
+		return set("replace", key, value, ttl, null, 0L, primitiveAsString);
 	}
 
 	/**
@@ -342,7 +371,7 @@ public class AscIIClient extends MemCachedClient {
 	 *            if true, then store all primitives as their string value
 	 * @return true/false indicating success
 	 */
-	private boolean set(String cmdname, String key, Object value, Date expiry, Integer hashCode, Long casUnique,
+	private boolean set(String cmdname, String key, Object value, Long expiry, Integer hashCode, Long casUnique,
 			boolean asString) {
 
 		if (cmdname == null || key == null) {
@@ -375,14 +404,11 @@ public class AscIIClient extends MemCachedClient {
 			return false;
 		}
 
-		if (expiry == null)
-			expiry = new Date(0);
-
 		// store flags
 		int flags = asString ? MemCachedClient.MARKER_STRING : NativeHandler.getMarkerFlag(value);
 		// construct the command
 		String cmd = new StringBuffer().append(cmdname).append(" ").append(key).append(" ").append(flags).append(" ")
-				.append(expiry.getTime() / 1000).append(" ").toString();
+				.append(expiry).append(" ").toString();
 
 		try {
 			sock.writeBuf.clear();
