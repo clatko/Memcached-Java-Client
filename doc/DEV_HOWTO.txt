@@ -1,16 +1,17 @@
 
 Software requirement
 =======================
-1. JDK 1.5+
+1. JDK 1.7+
 2. Apache Ant 1.7.1+
 Uncompress the source package and enter the top of directory.
 
 How to build the source code
 =============================
-1. Run the following command, binary and test jar package will be generated for you.
+1. Make sure jmemcached-core-1.0.0.jar is in the lib directory
+2. Run the following command, binary and test jar package will be generated for you.
 ant jar
-2. java_memcached-release_{version}.jar is the binary package.
-3. java_memcached-release_test_{version}.jar is the test package.
+3. java_memcached-release_{version}.jar is the binary package.
+4. java_memcached-release_test_{version}.jar is the test package.
 
 Unit test and code coverage
 ============================

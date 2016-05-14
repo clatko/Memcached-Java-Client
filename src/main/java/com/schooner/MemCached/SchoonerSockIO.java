@@ -38,7 +38,7 @@ import org.apache.commons.pool.impl.GenericObjectPool;
 import com.whalin.MemCached.SockIOPool;
 
 /**
- * An adapter of com.danga.MemCached.SockIOPool.SockIO.
+ * An adapter of com.whalin.MemCached.SockIOPool.SockIO.
  * 
  * @author Xingen Wang
  * @since 2.5.0

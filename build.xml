@@ -42,12 +42,12 @@
 		<delete dir="${test.build.dir}" />
 	</target>
 
-	<!-- compilation target for packeging operations -->
+	<!-- compilation target for packaging operations -->
 	<target name="compile" depends="clean">
 		<mkdir dir="${build.dir}" />
 		<mkdir dir="${test.build.dir}" />
-		<javac optimize="yes" srcdir="${src.dir}" destdir="${build.dir}" deprecation="true" target="1.5" source="1.5" nowarn="true" classpathref="build.classpath" />
-		<javac optimize="yes" srcdir="${test.dir}" destdir="${test.build.dir}" deprecation="true" target="1.5" source="1.5" nowarn="true">
+		<javac includeantruntime="false" optimize="yes" srcdir="${src.dir}" destdir="${build.dir}" deprecation="true" target="1.7" source="1.7" nowarn="true" classpathref="build.classpath" />
+		<javac includeantruntime="false" optimize="yes" srcdir="${test.dir}" destdir="${test.build.dir}" deprecation="true" target="1.7" source="1.7" nowarn="true">
 			<classpath refid="build.classpath" />
 			<classpath path="${build.dir}" />
 		</javac>
@@ -68,13 +68,13 @@
 		<jar jarfile="${project}_${ver}.jar">
 			<fileset dir="${build.dir}">
 				<include name="com/schooner/MemCached/**/*" />
-				<include name="com/danga/MemCached/**/*" />
+				<include name="com/whalin/MemCached/**/*" />
 			</fileset>
 		</jar>
 		<jar jarfile="${project}_test_${ver}.jar">
 			<fileset dir="${test.build.dir}">
 				<include name="com/schooner/MemCached/**/*" />
-				<include name="com/danga/MemCached/**/*" />
+				<include name="com/whalin/MemCached/**/*" />
 			</fileset>
 		</jar>
 		<antcall target="clean" />
@@ -83,7 +83,7 @@
 	<target name="runTest" depends="compile">
 		<emma enabled="${emma.enabled}">
 			<instr instrpath="${build.dir}" metadatafile="${report.dir}/metadata.emma" mode="overwrite">
-				<filter value="+com.schooner.MemCached.*, -com.schooner.MemCached.*Test*, -com.danga.MemCached.*" />
+				<filter value="+com.schooner.MemCached.*, -com.schooner.MemCached.*Test*, -com.whalin.MemCached.*" />
 			</instr>
 		</emma>
 		<junit printsummary="yes" showoutput="true" fork="true">
@@ -182,7 +182,7 @@
 		<delete dir="${project}_${ver}" />
 	</target>
 	<target name="javadoc">
-		<javadoc access="public" author="true" classpath="lib/junit.jar" destdir="javadoc" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="com.schooner.MemCached,com.schooner.MemCached.command,com.danga.MemCached" source="1.5" sourcepath="src/main" splitindex="true" use="true" version="true" />
+		<javadoc access="public" author="true" classpath="lib/junit.jar" destdir="javadoc" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="com.schooner.MemCached,com.schooner.MemCached.command,com.whalin.MemCached" source="1.7" sourcepath="src/main" splitindex="true" use="true" version="true" />
 	</target>
 	<target name="release">
 		<antcall target="jar" />

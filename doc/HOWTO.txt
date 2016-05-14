@@ -8,7 +8,7 @@ Lets say you have 3 servers.  Server 1 and server 2 have 3GB of space
 and server 3 has 2GB of space for cache.  Here is how I would set up
 my client.
 -----------------------------------------------------------------------------
-import com.danga.MemCached.*;
+import com.whalin.MemCached.*;
 public class MyClass {
 
 	// create a static client as most installs only need
